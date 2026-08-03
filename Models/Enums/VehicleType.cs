@@ -1,0 +1,73 @@
+using System.Text.Json.Serialization;
+using GoogleMapsPlatform.Core.Enum;
+
+namespace GoogleMapsPlatform.Models.Enums;
+
+/// <summary>
+/// The type of vehicle used.
+/// <list type="bullet">
+///   <item><description><c>BUS</c> -	Bus.</description></item>
+///   <item><description><c>CABLE_CAR</c> -	A vehicle that operates on a cable, usually on the ground. Aerial cable cars may be of the type GONDOLA_LIFT.</description></item>
+///   <item><description><c>COMMUTER_TRAIN</c> -	Commuter rail.</description></item>
+///   <item><description><c>FERRY</c> -	Ferry.</description></item>
+///   <item><description><c>FUNICULAR</c> -	A vehicle that is pulled up a steep incline by a cable. A Funicular typically consists of two cars, with each car acting as a counterweight for the other.</description></item>
+///   <item><description><c>GONDOLA_LIFT</c> -	An aerial cable car.</description></item>
+///   <item><description><c>HEAVY_RAIL</c> -	Heavy rail.</description></item>
+///   <item><description><c>HIGH_SPEED_TRAIN</c> -	High speed train.</description></item>
+///   <item><description><c>INTERCITY_BUS</c> -	Intercity bus.</description></item>
+///   <item><description><c>LONG_DISTANCE_TRAIN</c> -	Long distance train.</description></item>
+///   <item><description><c>METRO_RAIL</c> -	Light rail transit.</description></item>
+///   <item><description><c>MONORAIL</c> -	Monorail.</description></item>
+///   <item><description><c>OTHER</c> -	All other vehicles will return this type.</description></item>
+///   <item><description><c>RAIL</c> -	Rail.</description></item>
+///   <item><description><c>SHARE_TAXI</c> -	Share taxi is a kind of bus with the ability to drop off and pick up passengers anywhere on its route.</description></item>
+///   <item><description><c>SUBWAY</c> -	Underground light rail.</description></item>
+///   <item><description><c>TRAM</c> -	Above ground light rail.</description></item>
+///   <item><description><c>TROLLEYBUS</c> -	Trolleybus.</description></item>
+/// </list>
+/// </summary>
+[JsonConverter(typeof(StringEnumConverter<VehicleType>))]
+public sealed record VehicleType : StringEnum<VehicleType>
+{
+    private VehicleType(string value) : base(value)
+    {
+    }
+
+    public static readonly VehicleType Bus = new("BUS");
+
+    public static readonly VehicleType CableCar = new("CABLE_CAR");
+
+    public static readonly VehicleType CommuterTrain = new("COMMUTER_TRAIN");
+
+    public static readonly VehicleType Ferry = new("FERRY");
+
+    public static readonly VehicleType Funicular = new("FUNICULAR");
+
+    public static readonly VehicleType GondolaLift = new("GONDOLA_LIFT");
+
+    public static readonly VehicleType HeavyRail = new("HEAVY_RAIL");
+
+    public static readonly VehicleType HighSpeedTrain = new("HIGH_SPEED_TRAIN");
+
+    public static readonly VehicleType IntercityBus = new("INTERCITY_BUS");
+
+    public static readonly VehicleType LongDistanceTrain = new("LONG_DISTANCE_TRAIN");
+
+    public static readonly VehicleType MetroRail = new("METRO_RAIL");
+
+    public static readonly VehicleType Monorail = new("MONORAIL");
+
+    public static readonly VehicleType Other = new("OTHER");
+
+    public static readonly VehicleType Rail = new("RAIL");
+
+    public static readonly VehicleType ShareTaxi = new("SHARE_TAXI");
+
+    public static readonly VehicleType Subway = new("SUBWAY");
+
+    public static readonly VehicleType Tram = new("TRAM");
+
+    public static readonly VehicleType Trolleybus = new("TROLLEYBUS");
+
+    public static VehicleType FromValue(string value) => FromValueCore(value);
+}
