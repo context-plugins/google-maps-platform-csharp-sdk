@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using GoogleMapsPlatform.Core.Models;
 
 namespace GoogleMapsPlatform.Models;
 
@@ -12,4 +13,7 @@ public record Bounds
 
     [JsonPropertyName("southwest")]
     public required Southwest Southwest { get; init; }
+
+    [JsonExtensionData]
+    public AdditionalProperties AdditionalProperties { get; init; } = [];
 }

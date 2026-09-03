@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using GoogleMapsPlatform.Core.Models;
 using GoogleMapsPlatform.Models.Enums;
 
 namespace GoogleMapsPlatform.Models;
@@ -23,4 +24,7 @@ public record DistanceMatrixElement
 
     [JsonPropertyName("status")]
     public required DistanceMatrixElementStatus Status { get; init; }
+
+    [JsonExtensionData]
+    public AdditionalProperties AdditionalProperties { get; init; } = [];
 }

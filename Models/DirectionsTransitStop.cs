@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using GoogleMapsPlatform.Core.Models;
 
 namespace GoogleMapsPlatform.Models;
 
@@ -12,4 +13,7 @@ public record DirectionsTransitStop
     /// </summary>
     [JsonPropertyName("name")]
     public required string Name { get; init; }
+
+    [JsonExtensionData]
+    public AdditionalProperties AdditionalProperties { get; init; } = [];
 }

@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using GoogleMapsPlatform.Core.Models;
 
 namespace GoogleMapsPlatform.Models;
 
@@ -10,4 +11,7 @@ public record PlaceOpeningHoursPeriod
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("close")]
     public PlaceOpeningHoursPeriodDetail? Close { get; init; }
+
+    [JsonExtensionData]
+    public AdditionalProperties AdditionalProperties { get; init; } = [];
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using GoogleMapsPlatform.Core.Models;
 using GoogleMapsPlatform.Models.Enums;
 
 namespace GoogleMapsPlatform.Models;
@@ -22,4 +23,7 @@ public record GeocodingResponse
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("error_message")]
     public string? ErrorMessage { get; init; }
+
+    [JsonExtensionData]
+    public AdditionalProperties AdditionalProperties { get; init; } = [];
 }

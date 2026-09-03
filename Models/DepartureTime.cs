@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using GoogleMapsPlatform.Core.Models;
 
 namespace GoogleMapsPlatform.Models;
 
@@ -21,4 +22,7 @@ public record DepartureTime
     /// </summary>
     [JsonPropertyName("time_zone")]
     public required string TimeZone { get; init; }
+
+    [JsonExtensionData]
+    public AdditionalProperties AdditionalProperties { get; init; } = [];
 }

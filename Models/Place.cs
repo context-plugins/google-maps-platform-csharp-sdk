@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using GoogleMapsPlatform.Core.Models;
 using GoogleMapsPlatform.Models.Enums;
 
 namespace GoogleMapsPlatform.Models;
@@ -310,4 +311,7 @@ public record Place
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("wheelchair_accessible_entrance")]
     public bool? WheelchairAccessibleEntrance { get; init; }
+
+    [JsonExtensionData]
+    public AdditionalProperties AdditionalProperties { get; init; } = [];
 }

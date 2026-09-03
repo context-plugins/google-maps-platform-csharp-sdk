@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using GoogleMapsPlatform.Core.Models;
 
 namespace GoogleMapsPlatform.Models;
 
@@ -30,4 +31,7 @@ public record PlaceAutocompleteStructuredFormat
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("secondary_text_matched_substrings")]
     public IReadOnlyList<PlaceAutocompleteMatchedSubstring>? SecondaryTextMatchedSubstrings { get; init; }
+
+    [JsonExtensionData]
+    public AdditionalProperties AdditionalProperties { get; init; } = [];
 }

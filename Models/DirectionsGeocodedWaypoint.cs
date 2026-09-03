@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using GoogleMapsPlatform.Core.Models;
 using GoogleMapsPlatform.Models.Enums;
 
 namespace GoogleMapsPlatform.Models;
@@ -63,4 +64,7 @@ public record DirectionsGeocodedWaypoint
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("area_type")]
     public IReadOnlyList<AreaType>? AreaType { get; init; }
+
+    [JsonExtensionData]
+    public AdditionalProperties AdditionalProperties { get; init; } = [];
 }

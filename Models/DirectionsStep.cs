@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using GoogleMapsPlatform.Core.Models;
 using GoogleMapsPlatform.Models.Enums;
 
 namespace GoogleMapsPlatform.Models;
@@ -50,4 +51,7 @@ public record DirectionsStep
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("steps")]
     public object? Steps { get; init; }
+
+    [JsonExtensionData]
+    public AdditionalProperties AdditionalProperties { get; init; } = [];
 }

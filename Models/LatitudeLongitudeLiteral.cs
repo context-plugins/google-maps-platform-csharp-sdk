@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using GoogleMapsPlatform.Core.Models;
 
 namespace GoogleMapsPlatform.Models;
 
@@ -18,4 +19,7 @@ public record LatitudeLongitudeLiteral
     /// </summary>
     [JsonPropertyName("longitude")]
     public required double Longitude { get; init; }
+
+    [JsonExtensionData]
+    public AdditionalProperties AdditionalProperties { get; init; } = [];
 }

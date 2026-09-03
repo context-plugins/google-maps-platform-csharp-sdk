@@ -394,9 +394,9 @@ try
 }
 catch (SdkException<GeolocateError> ex)
 {
-    if (ex.Error.TryGetError(out var error))
+    if (ex.Error.TryGetGeolocationV1Geolocate400Error1(out var error))
     {
-        // TODO: Handle 'error' of type GeolocateError
+        // TODO: Handle 'error' of type GeolocationV1Geolocate400Error1
     }
 }
 ```
@@ -1027,9 +1027,9 @@ try
 }
 catch (SdkException<NearestRoadsApiError> ex)
 {
-    if (ex.Error.TryGetError(out var error))
+    if (ex.Error.TryGetNearestRoadsErrorResponse(out var error))
     {
-        // TODO: Handle 'error' of type NearestRoadsApiError
+        // TODO: Handle 'error' of type NearestRoadsErrorResponse
     }
 }
 ```

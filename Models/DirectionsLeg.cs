@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using GoogleMapsPlatform.Core.Models;
 
 namespace GoogleMapsPlatform.Models;
 
@@ -60,4 +61,7 @@ public record DirectionsLeg
     /// </summary>
     [JsonPropertyName("via_waypoint")]
     public required IReadOnlyList<DirectionsViaWaypoint> ViaWaypoint { get; init; }
+
+    [JsonExtensionData]
+    public AdditionalProperties AdditionalProperties { get; init; } = [];
 }

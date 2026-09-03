@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using GoogleMapsPlatform.Core.Models;
 
 namespace GoogleMapsPlatform.Models;
 
@@ -15,4 +16,7 @@ public record DirectionsTrafficSpeedEntry
     /// </summary>
     [JsonPropertyName("offset_meters")]
     public required double OffsetMeters { get; init; }
+
+    [JsonExtensionData]
+    public AdditionalProperties AdditionalProperties { get; init; } = [];
 }

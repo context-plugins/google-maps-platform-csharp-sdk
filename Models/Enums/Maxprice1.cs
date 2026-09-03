@@ -13,14 +13,29 @@ public sealed record Maxprice1 : StringEnum<Maxprice1>
     {
     }
 
+    /// <summary>
+    /// Free.
+    /// </summary>
     public static readonly Maxprice1 _0 = new("0");
 
+    /// <summary>
+    /// Inexpensive.
+    /// </summary>
     public static readonly Maxprice1 _1 = new("1");
 
+    /// <summary>
+    /// Moderately priced.
+    /// </summary>
     public static readonly Maxprice1 _2 = new("2");
 
+    /// <summary>
+    /// Expensive.
+    /// </summary>
     public static readonly Maxprice1 _3 = new("3");
 
+    /// <summary>
+    /// Very expensive.
+    /// </summary>
     public static readonly Maxprice1 _4 = new("4");
 
     public static Maxprice1 FromValue(string value) => FromValueCore(value);

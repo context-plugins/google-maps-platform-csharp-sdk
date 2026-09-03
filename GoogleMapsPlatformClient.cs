@@ -11,9 +11,13 @@ namespace GoogleMapsPlatform;
 /// </summary>
 public sealed class GoogleMapsPlatformClient
 {
+    private readonly RawClient _rawClient;
+    private readonly Server _server;
+    private readonly AuthSchemes _auth;
+
     public GoogleMapsPlatformClient(HttpClient httpClient, GoogleMapsPlatformClientOptions options)
     {
-        var server = new Server(options.Environment, options.Server);
+        _server = new Server(options.Environment, options.Server);
         var queryParameterFactory = new QueryParameterFactory([]);
         var templateParamsFactory = new TemplateParamsFactory([]);
         var urlFactory = new UriFactory(queryParameterFactory, templateParamsFactory);
@@ -27,35 +31,32 @@ public sealed class GoogleMapsPlatformClient
                     new HeaderParam("X-APIMatic-Runtime", RuntimeEnvironment.Runtime)]);
         var resiliencePipelineFactory = new ResiliencePipelineFactory(options.Retry);
         var httpLogger = new HttpLogger(options.Logging, "GoogleMapsPlatformClient");
-        var rawClient =
-            new RawClient(httpClient, urlFactory, httpStatusPolicy, headersFactory, resiliencePipelineFactory, httpLogger);
-        var auth = new AuthSchemes(options);
-        DirectionsApi = new DirectionsApi(rawClient, server, auth);
-        DistanceMatrixApi = new DistanceMatrixApi(rawClient, server, auth);
-        ElevationApi = new ElevationApi(rawClient, server, auth);
-        GeocodingApi = new GeocodingApi(rawClient, server, auth);
-        GeolocationApi = new GeolocationApi(rawClient, server, auth);
-        PlacesApi = new PlacesApi(rawClient, server, auth);
-        RoadsApi = new RoadsApi(rawClient, server, auth);
-        StreetViewApi = new StreetViewApi(rawClient, server, auth);
-        TimeZoneApi = new TimeZoneApi(rawClient, server, auth);
+        _rawClient =
+            new RawClient(httpClient,
+                urlFactory,
+                httpStatusPolicy,
+                headersFactory,
+                resiliencePipelineFactory,
+                httpLogger,
+                options.Hooks);
+        _auth = new AuthSchemes(options);
     }
 
-    public DirectionsApi DirectionsApi { get; }
+    public DirectionsApi DirectionsApi => field ??= new DirectionsApi(_rawClient, _server, _auth);
 
-    public DistanceMatrixApi DistanceMatrixApi { get; }
+    public DistanceMatrixApi DistanceMatrixApi => field ??= new DistanceMatrixApi(_rawClient, _server, _auth);
 
-    public ElevationApi ElevationApi { get; }
+    public ElevationApi ElevationApi => field ??= new ElevationApi(_rawClient, _server, _auth);
 
-    public GeocodingApi GeocodingApi { get; }
+    public GeocodingApi GeocodingApi => field ??= new GeocodingApi(_rawClient, _server, _auth);
 
-    public GeolocationApi GeolocationApi { get; }
+    public GeolocationApi GeolocationApi => field ??= new GeolocationApi(_rawClient, _server, _auth);
 
-    public PlacesApi PlacesApi { get; }
+    public PlacesApi PlacesApi => field ??= new PlacesApi(_rawClient, _server, _auth);
 
-    public RoadsApi RoadsApi { get; }
+    public RoadsApi RoadsApi => field ??= new RoadsApi(_rawClient, _server, _auth);
 
-    public StreetViewApi StreetViewApi { get; }
+    public StreetViewApi StreetViewApi => field ??= new StreetViewApi(_rawClient, _server, _auth);
 
-    public TimeZoneApi TimeZoneApi { get; }
+    public TimeZoneApi TimeZoneApi => field ??= new TimeZoneApi(_rawClient, _server, _auth);
 }

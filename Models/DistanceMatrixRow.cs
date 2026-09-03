@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using GoogleMapsPlatform.Core.Models;
 
 namespace GoogleMapsPlatform.Models;
 
@@ -16,4 +17,7 @@ public record DistanceMatrixRow
     /// </summary>
     [JsonPropertyName("elements")]
     public required IReadOnlyList<DistanceMatrixElement> Elements { get; init; }
+
+    [JsonExtensionData]
+    public AdditionalProperties AdditionalProperties { get; init; } = [];
 }

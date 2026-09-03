@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using GoogleMapsPlatform.Core.Models;
 
 namespace GoogleMapsPlatform.Models;
 
@@ -15,4 +16,7 @@ public record PlaceAutocompleteMatchedSubstring
     /// </summary>
     [JsonPropertyName("offset")]
     public required double Offset { get; init; }
+
+    [JsonExtensionData]
+    public AdditionalProperties AdditionalProperties { get; init; } = [];
 }
