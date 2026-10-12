@@ -2,26 +2,27 @@
 
 # DirectionsApi — operations
 
-Accessor: `client.DirectionsApi` · Source: `Api/DirectionsApi.cs` · 1 operation
+Accessor: `client.DirectionsApi` · Source: `src/GoogleMapsPlatform/Api/DirectionsApi.cs` · 1 operation
 
 **Type sources**: the file declaring each type an operation names (`RawError` excluded — see sdk-map.md).
 
 ### Directions
 
 - **Auth**: `options.ApiKeyAuth`
-- **Signature**: `Directions(string destination, string origin, double? arrivalTime, double? departureTime, bool? alternatives, string? avoid, Units1? units, string? waypoints, Language1? language, Mode1? mode, Region1? region, TrafficModel1? trafficModel, string? transitMode, TransitRoutingPreference1? transitRoutingPreference, RequestOptions? requestOptions = null, CancellationToken ct = default)`
-  - 12 params (`arrivalTime` … `transitRoutingPreference`) — nullable, no default → **must pass explicitly** (pass `null` to skip)
-- **Query params (wire ← C#)**: `destination` ← `destination`, `origin` ← `origin`, `arrival_time` ← `arrivalTime`, `departure_time` ← `departureTime`, `alternatives` ← `alternatives`, `avoid` ← `avoid`, `units` ← `units`, `waypoints` ← `waypoints`, `language` ← `language`, `mode` ← `mode`, `region` ← `region`, `traffic_model` ← `trafficModel`, `transit_mode` ← `transitMode`, `transit_routing_preference` ← `transitRoutingPreference`
+- **Signature**: `Directions(DirectionsRequest request, RequestOptions? requestOptions = null, CancellationToken cancellationToken = default)`
+  - required: `Destination`, `Origin`
+- **Query params (wire ← C#)**: `destination` ← `Destination`, `origin` ← `Origin`, `arrival_time` ← `ArrivalTime`, `departure_time` ← `DepartureTime`, `alternatives` ← `Alternatives`, `avoid` ← `Avoid`, `units` ← `Units`, `waypoints` ← `Waypoints`, `language` ← `Language`, `mode` ← `Mode`, `region` ← `Region`, `traffic_model` ← `TrafficModel`, `transit_mode` ← `TransitMode`, `transit_routing_preference` ← `TransitRoutingPreference`
 - **Returns**: `DirectionsResponse`
-- **Error**: `SdkException<RawError>` — **Case B**
+- **Error**: `ApiException<RawError>` — **Case B**
 
 | Type | Source |
 | --- | --- |
-| `Units1` | `Models/Enums/Units1.cs` |
-| `Language1` | `Models/Enums/Language1.cs` |
-| `Mode1` | `Models/Enums/Mode1.cs` |
-| `Region1` | `Models/Enums/Region1.cs` |
-| `TrafficModel1` | `Models/Enums/TrafficModel1.cs` |
-| `TransitRoutingPreference1` | `Models/Enums/TransitRoutingPreference1.cs` |
-| `DirectionsResponse` | `Models/DirectionsResponse.cs` |
+| `DirectionsRequest` | `src/GoogleMapsPlatform/Requests/DirectionsApi/DirectionsRequest.cs` |
+| `Units1` | `src/GoogleMapsPlatform/Models/Enums/Units1.cs` |
+| `Language1` | `src/GoogleMapsPlatform/Models/Enums/Language1.cs` |
+| `Mode1` | `src/GoogleMapsPlatform/Models/Enums/Mode1.cs` |
+| `Region1` | `src/GoogleMapsPlatform/Models/Enums/Region1.cs` |
+| `TrafficModel1` | `src/GoogleMapsPlatform/Models/Enums/TrafficModel1.cs` |
+| `TransitRoutingPreference1` | `src/GoogleMapsPlatform/Models/Enums/TransitRoutingPreference1.cs` |
+| `DirectionsResponse` | `src/GoogleMapsPlatform/Models/DirectionsResponse.cs` |
 

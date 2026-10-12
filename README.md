@@ -19,8 +19,30 @@ API Specification for Google Maps Platform
 Add the .NET SDK as a project reference into your solution:
 
 ```bash
-dotnet add reference <path-to-sdk>/GoogleMapsPlatform.csproj
+dotnet add reference <path-to-sdk>/src/GoogleMapsPlatform/GoogleMapsPlatform.csproj
 ```
+
+The project takes its build settings from the files around it, so reference it in place. Building from source needs the .NET 10 SDK (C# 14); the package itself targets netstandard2.0.
+
+The assembly embeds its PDB, so stack traces carry SDK file and line numbers.
+
+---
+
+## Building from source
+
+```bash
+dotnet pack src/GoogleMapsPlatform/GoogleMapsPlatform.csproj -c Release
+```
+
+Release packs come from CI, where `CI=true` makes the build deterministic; to reproduce that locally add `-p:ContinuousIntegrationBuild=true`.
+
+The generator never emits `Directory.Build.targets`, so a customer-owned one at the repo root is MSBuild's auto-imported customization seam. It imports after the props and the project body into every project under the root, so put SDK-only settings under `<PropertyGroup Condition="'$(MSBuildProjectName)' == 'GoogleMapsPlatform'">`.
+
+It overrides every property the SDK reads when targets run (package metadata, `Version`, `AssemblyVersion`, compiler warnings, package references, which under central package management use `VersionOverride`). It cannot change values the SDK derives earlier: `TargetFramework(s)`, `AssemblyName` and output paths stay generator settings; turning off `GenerateDocumentationFile` also needs `<DocumentationFile />`; a `ContinuousIntegrationBuild` set there also needs `<DeterministicSourcePaths>true</DeterministicSourcePaths>`.
+
+The SDK's props files are a boundary: a parent repository's `Directory.Build.props` does not apply, while a parent `Directory.Build.targets` does.
+
+APIMatic's delivery tools do not yet preserve `Directory.Build.targets` across regeneration — list it in `.codegenignore` when publishing to GitHub.
 
 ---
 
@@ -28,30 +50,29 @@ dotnet add reference <path-to-sdk>/GoogleMapsPlatform.csproj
 
 ### Dependency Injection
 
-Register the client with `IServiceCollection` and resolve it from the container. The `HttpClient` is managed by `IHttpClientFactory`. Configure the client's behavior through [GoogleMapsPlatformClientOptions](GoogleMapsPlatformClientOptions.cs).
+Register the client with `IServiceCollection` and resolve it from the container. The `HttpClient` is managed by `IHttpClientFactory`. Configure the client's behavior through [GoogleMapsPlatformClientOptions](src/GoogleMapsPlatform/GoogleMapsPlatformClientOptions.cs).
 
 ```csharp
 services.AddGoogleMapsPlatformClient(options =>
-    {
-        options.ApiKeyAuth = "YOUR_API_KEY";
-        options.Environment = ServerEnvironment.Production;
-        // TODO: configure more client options here
-    });
+{
+    options.ApiKeyAuth = "YOUR_API_KEY";
+    options.Environment = ServerEnvironment.Production;
+    // TODO: configure more client options here
+});
 ```
 
 ### Direct Instantiation
 
-Create the client by passing an `HttpClient` you manage yourself. Configure the client's behavior through [GoogleMapsPlatformClientOptions](GoogleMapsPlatformClientOptions.cs).
+Create the client by passing an `HttpClient` you manage yourself. Configure the client's behavior through [GoogleMapsPlatformClientOptions](src/GoogleMapsPlatform/GoogleMapsPlatformClientOptions.cs).
 
 ```csharp
 var httpClient = new HttpClient();
 // TODO: configure more client options here
-var options =
-    new GoogleMapsPlatformClientOptions
-    {
-        ApiKeyAuth = "YOUR_API_KEY",
-        Environment = ServerEnvironment.Production,
-    };
+var options = new GoogleMapsPlatformClientOptions
+{
+    ApiKeyAuth = "YOUR_API_KEY",
+    Environment = ServerEnvironment.Production,
+};
 var client = new GoogleMapsPlatformClient(httpClient, options);
 ```
 
@@ -60,6 +81,21 @@ var client = new GoogleMapsPlatformClient(httpClient, options);
 ## Usage
 
 For code examples and error responses, see [API Reference](api-reference.md).
+
+## Enums
+
+Every enum the spec declares is a sealed record with one `public static readonly` member per value (`GeocoderStatus.Ok`), a JSON converter, and a `Match` that makes handling exhaustive: one `on{Member}` arm per known value, then `otherwise`, which receives the raw wire value the server sent when it is one this SDK does not declare.
+
+```csharp
+var label =
+    received.Match(onOk: () => "Ok", onZeroResults: () => "ZeroResults", otherwise: raw => $"undeclared ({raw})");
+```
+
+Prefer named arguments as above. The arms are positional, in the order the spec lists its values, and a regenerated SDK that adds or moves a value changes the `Match` signature: a positional call site compiled against the old shape either stops compiling or, if the assembly is not rebuilt, throws `MissingMethodException` at the first call, and a reordered value can rebind a positional argument to a different member without any diagnostic. Treat an added or moved enum value as a breaking change of that enum. Code that must survive regeneration untouched compares instead of matching: `received == GeocoderStatus.Ok` or `received.Is(rawValue)` against a raw wire value; neither reopens construction.
+
+A value the SDK does not declare still round-trips: `IsKnownValue()` tells you whether it is one of the generated members, and sending the instance back echoes the server's own casing. You cannot construct an undeclared value yourself — there is no public factory — so a typo cannot compile; resolve a raw value with `GeocoderStatus.TryGetKnownValue("OK", out var known)`.
+
+A spec value whose name would collide with the enum's own name, with a member every enum inherits or generates (such as `Value`, `Match` or `IsKnownValue`), or with a member of `object` takes a `Member` suffix — a value `value` becomes `ValueMember` — and the other members keep their plain names.
 
 ## SDK map
 
@@ -84,8 +120,57 @@ The map and the [API Reference](api-reference.md) answer different questions, an
 
 | Use | For |
 | --- | --- |
-| **[`sdk-map.md`](sdk-map.md) + [`map/`](map/)** | Traversing the SDK and working out its surface — locating the operation you need (this SDK exposes **17 operations**), its exact signature and parameter order, the shape and JSON wire names of the models it takes and returns, which error type it throws and how to read it, and the source file behind any of it. This is the index to consume the SDK from, and the one to reach for first. |
-| **[`api-reference.md`](api-reference.md)** | Usage guidance for a single operation once you know which one you want — a runnable code sample, per-parameter descriptions, and the error responses it can return. |
+| **[`sdk-map.md`](sdk-map.md) + [`map/`](map/)** | Traversing the SDK and working out its surface — locating the operation you need (this SDK exposes **17 operations**), its exact signature and request record, the shape and JSON wire names of the models it takes and returns, which error type it throws and how to read it, and the source file behind any of it. This is the index to consume the SDK from, and the one to reach for first. |
+| **[`api-reference.md`](api-reference.md)** | Usage guidance for a single operation once you know which one you want — a runnable code sample, a link to its request record, and the error responses it can return. |
+
+## Error Handling
+
+Operations throw when the server answers with an error status. `TError` is the operation's error type from the spec — `RawError` (the status code plus the raw body) when the spec declares none.
+
+```csharp
+using GoogleMapsPlatform.Core.Exceptions;           // the exception family
+using GoogleMapsPlatform.Errors;                    // generated error types such as GeolocateError
+using GoogleMapsPlatform.Requests.GeolocationApi;   // request records such as GeolocateRequest
+using GoogleMapsPlatform.Models;                    // models such as GeolocationV1GeolocateRequest
+
+try
+{
+    var response = await client.GeolocationApi.Geolocate(new GeolocateRequest
+    {
+        Body = new GeolocationV1GeolocateRequest
+        {
+            ConsiderIp = "false",
+            WifiAccessPoints = [
+                new WiFiAccessPoint { MacAddress = "84:d4:7e:09:a5:f1", SignalStrength = -43, SignalToNoiseRatio = 0 },
+                new WiFiAccessPoint { MacAddress = "44:48:c1:a6:f3:d0", SignalStrength = -55, SignalToNoiseRatio = 0 },
+            ],
+        },
+    });
+}
+catch (ApiException<GeolocateError> ex)
+{
+    // "POST <server>/geolocation/v1/geolocate returned 400 (BadRequest)."
+    Console.Error.WriteLine(ex.Message);
+    if (ex.Error.TryGetGeolocationV1Geolocate400Error1(out var geolocationV1Geolocate400Error1))
+    {
+        // TODO: handle 'geolocationV1Geolocate400Error1' of type GeolocationV1Geolocate400Error1
+    }
+}
+```
+
+Everything the SDK raises for a call derives from `SdkException`, which carries the failed call's `Method` and `RequestUri`. Every message starts with that call, and the underlying cause is always `InnerException`.
+
+| Exception | When | Extra members |
+| --- | --- | --- |
+| `ApiException<TError>` | The server answered with an error status | `Error`, plus `StatusCode`, `Headers` and `ContentType` from `ApiException` |
+| `ResponseDeserializationException` | A response body did not match the type the spec declares | `TargetType`, plus the `ApiException` members |
+| `SdkConnectionException` | The request could not be sent, or the response body could not be read |  |
+| `SdkTimeoutException` | An attempt, the transport, or a Server-Sent Events stream went silent (derives from `SdkConnectionException`) | `Timeout` |
+| `AuthSchemeException` | A credential could not be applied — for example the OAuth2 token endpoint refused it | `SchemeFailures` |
+
+Catch from specific to general: `ApiException` means the server answered, `SdkConnectionException` means it did not, and `SdkException` is everything the SDK raises. Your own cancellation surfaces as the usual `OperationCanceledException`, never wrapped.
+
+---
 
 ## Best Practices
 
@@ -94,9 +179,26 @@ The map and the [API Reference](api-reference.md) answer different questions, an
 > reuse it across all requests. Creating a new instance per request might exhaust the
 > connection pool.
 
+> [!TIP]
+> Let the SDK own timeouts. `RetryOptions.Timeout` bounds **each attempt** (default 100 s)
+> and a timed-out attempt is retried under the configured retry policy before it surfaces as
+> `SdkTimeoutException`; `Retry-After` response headers are honored when the server sends them.
+> Set `HttpClient.Timeout` to `Timeout.InfiniteTimeSpan` (or comfortably above
+> `RetryOptions.Timeout`) so the transport does not race the SDK — a transport-level timeout
+> surfaces as the same `SdkTimeoutException` but cannot be retried.
+
+> [!TIP]
+> The SDK reads time only through `GoogleMapsPlatformClientOptions.TimeProvider` (default
+> `TimeProvider.System`): retry backoff, `Retry-After`, the SSE idle timeout, OAuth2 token
+> expiry and the logged request durations all follow it. Under `AddGoogleMapsPlatformClient` a
+> `TimeProvider` registered in the container is picked up automatically, and setting the
+> option explicitly wins. To fake time in your own tests use a provider that implements
+> timers, such as `FakeTimeProvider` from `Microsoft.Extensions.TimeProvider.Testing`, so
+> retries and idle timeouts advance with it.
+
 ## License
 
-This SDK is distributed under the [MIT License](LICENSE).
+This SDK is distributed under the [MIT License](https://licenses.nuget.org/MIT).
 
 ---
 
@@ -106,7 +208,7 @@ Refer to the [API reference](api-reference.md) for detailed information on avail
 
 ---
 
-[license-url]: LICENSE
+[license-url]: https://licenses.nuget.org/MIT
 [license-badge]: https://img.shields.io/badge/License-MIT-blue.svg
 [apimatic-url]: https://www.apimatic.io
-[apimatic-badge]: https://www.apimatic.io/hubfs/Built-with-APIMatic-badge.svg
+[apimatic-badge]: https://img.shields.io/badge/Built%20with-APIMatic-blue.svg
